@@ -124,6 +124,7 @@ from discord.ext import commands, tasks
 Constants and bot initilization
 '''
 TOKEN = 'bot token redacted'
+USER_ID_LENGTH = 18
 description = '''A bot to streamline the COVID-19 stats from the BU testing dashboard'''
 bot = commands.Bot(command_prefix='?', description=description)
 registeredUsers = []
@@ -159,6 +160,8 @@ def updateValues():
 
 '''
 Display bot information in the backend
+
+After bot boots up, loads in the users that want updates.
 '''
 @bot.event
 async def on_ready():
@@ -166,6 +169,13 @@ async def on_ready():
     print(bot.user.name)
     print(bot.user.id)
     print('------')
+    try:
+        with open('users', 'r') as users:
+            for user in users:
+                if len(user) == USER_ID_LENGTH + 1:
+                    registeredUsers.append(bot.get_user(int(user[0:USER_ID_LENGTH])))
+    except:
+        print("No subscriber list found")
 
 '''
 Background task to call update every 10 minutes
@@ -232,9 +242,17 @@ async def register(ctx):
     user = ctx.author
     if user not in registeredUsers:
         registeredUsers.append(user)
+        with open('users', 'w') as userlist:
+            for user in registeredUsers:
+                userlist.write('%s\n' % user.id)
+        userlist.close()
         return await ctx.send("<@"+str(user.id)+">"+", you are registered to recieve updates")
     else:
         registeredUsers.remove(user)
+        with open('users', 'w') as userlist:
+            for user in registeredUsers:
+                userlist.write('%s\n' % user.id)
+        userlist.close()
         return await ctx.send("<@"+str(user.id)+">"+", you have been removed from recieving updates")
 
 '''
