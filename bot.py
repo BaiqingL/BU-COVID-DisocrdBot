@@ -79,22 +79,6 @@ def processData(rawDataSegment):
     isolationCountBeginIndex = rawDataSegment.rfind('\n',0,isolationCountEndIndex-1)
     isolationCount = rawDataSegment[isolationCountBeginIndex+1:isolationCountEndIndex-1]
 
-    '''
-    # If you want a simpler command line only tool you can use this to print out information on the console.
-    print("📅 Latest Date: " + date)
-    print("\n")
-    print("🔬 Daily: " + dailyTestConducted)
-    print("✔️ Daily Negative: " + dailyNegativeOutcome)
-    print("🤒 Daily Positive: " + dailyPositiveOutcome)
-    print("🤔 Daily Inconclusive: " + dailyInconclusiveOutcome)
-    print("\n")
-    print("🔬 Total: " + totalTestConducted)
-    print("✔️ Total Negative: " + totalNegativeOutcome)
-    print("🤒 Total Positive: " + totalPositiveOutcome)
-    print("🤔 Total Inconclusive: " + totalInconclusiveOutcome)
-    print("\n")
-    print("🥺 Isolation Count: " + isolationCount)
-    '''
     # Data array constructed with below values.
     return [
         date,
@@ -108,6 +92,25 @@ def processData(rawDataSegment):
         totalInconclusiveOutcome,
         isolationCount
         ]
+    
+'''
+Make the data look nicer in the backend.
+'''
+def backendReport(data):
+    print("📅 Latest Date: " + data[0])
+    print("\n")
+    print("🔬 Daily: " + data[1])
+    print("✔️ Daily Negative: " + data[2])
+    print("🤒 Daily Positive: " + data[3])
+    print("🤔 Daily Inconclusive: " + data[4])
+    print("\n")
+    print("🔬 Total: " + data[5])
+    print("✔️ Total Negative: " + data[6])
+    print("🤒 Total Positive: " + data[7])
+    print("🤔 Total Inconclusive: " + data[8])
+    print("\n")
+    print("🥺 Isolation Count: " + data[9])
+
 
 '''
 Data extraction part complete, discord part below.
@@ -195,7 +198,7 @@ async def updateDashboard():
     updateValues()
     # Report data array to the backend, consult processData() for value meaning.
     print("Update finished on: " + lastChecked.strftime("%Y-%m-%d %H:%M:%S"))
-    print("Data: " +  str(data))
+    backendReport(data)
     
     # Check to see if the bot needs to send out alerts
     if data[DAILY_CASE_LOCATION] != 0 and data[0] != tempDate:
