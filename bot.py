@@ -206,7 +206,7 @@ async def updateDashboard():
                 await user.send("Infections case count increased by " + data[DAILY_CASE_LOCATION] + " on " + latestDataDate\
                     + " to a total of " + data[TOTAL_CASE_LOCATION] + "cases.")
     else:
-        print("No new cases, no need to alert.")
+        print("No new cases / No new data, no need to alert.")
 
 '''
 Helper for the background task, waits for the bot to be
@@ -257,16 +257,16 @@ async def register(ctx):
         registeredUsers.append(user)
         # This appraoch isn't efficient, but it works and I am not expecting too many users.
         with open('users', 'w') as userlist:
-            for user in registeredUsers:
-                userlist.write('%s\n' % user.id)
+            for userEntry in registeredUsers:
+                userlist.write('%s\n' % userEntry.id)
         userlist.close()
         return await ctx.send("<@"+str(user.id)+">"+", you are registered to recieve updates")
     # This user wants to be removed from the subscriber list.
     else:
         registeredUsers.remove(user)
         with open('users', 'w') as userlist:
-            for user in registeredUsers:
-                userlist.write('%s\n' % user.id)
+            for userEntry in registeredUsers:
+                userlist.write('%s\n' % userEntry.id)
         userlist.close()
         return await ctx.send("<@"+str(user.id)+">"+", you have been removed from recieving updates")
 
