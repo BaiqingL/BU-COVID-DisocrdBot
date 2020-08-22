@@ -1,7 +1,7 @@
-# BU-COVID-DisocrdBot
+## BU COVID-19 Alerts via Discord
 Automatically scrape the BU COVID-19 statistics and update them to a discord channel for faster access.
 
-### Commands:
+#### Commands:
 * **`?stats`**
 
 This will bring up a dashboard of the daily and total testing outcomes.
