@@ -206,8 +206,11 @@ async def updateDashboard():
         for user in registeredUsers:
             # Account for cases where an user account is deleted/banned
             if (user != None):
-                await user.send("Infections case count increased by " + data[DAILY_CASE_LOCATION] + " on " + latestDataDate\
-                    + " to a total of " + data[TOTAL_CASE_LOCATION] + "cases.")
+                try:
+                    await user.send("Infections case count increased by " + data[DAILY_CASE_LOCATION] + " on " + latestDataDate\
+                        + " to a total of " + data[TOTAL_CASE_LOCATION] + "cases.")
+                except:
+                    print(str(user) + " does not allow private messages.")
     else:
         print("No new cases / No new data, no need to alert.")
 
