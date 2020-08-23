@@ -208,7 +208,7 @@ async def updateDashboard():
             if (user != None):
                 try:
                     await user.send("Infections case count increased by " + data[DAILY_CASE_LOCATION] + " on " + latestDataDate\
-                        + " to a total of " + data[TOTAL_CASE_LOCATION] + "cases.")
+                        + " to a total of " + data[TOTAL_CASE_LOCATION] + " cases.")
                 except:
                     print(str(user) + " does not allow private messages.")
     else:
