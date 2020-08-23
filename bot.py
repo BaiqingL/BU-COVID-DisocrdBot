@@ -22,7 +22,7 @@ This means we need to use selenium to properly render and grab data.
 '''
 def getRawData(driver):
     driver.get('https://app.powerbi.com/view?r=eyJrIjoiMzI4OTBlMzgtODg5MC00OGEwLThlMDItNGJiNDdjMDU5ODhkIiwidCI6ImQ1N2QzMmNjLWMxMjEtNDg4Zi1iMDdiLWRmZTcwNTY4MGM3MSIsImMiOjN9')
-    # We are looking for reportLandingContainer.
+    # We are looking for reportLandingContainer, wait for the page to populate with proper results before exiting.
     rawDataSegment = ""
     while len(rawDataSegment) < ESTIMATED_DATA_LENGTH:
         rawDataSegment = driver.find_element_by_id('reportLandingContainer').text
@@ -97,27 +97,23 @@ def processData(rawDataSegment):
 Make the data look nicer in the backend.
 '''
 def backendReport(data):
-    print("📅 Latest Date: " + data[0])
     print("\n")
+    print("📅 Latest Date: " + data[0])
     print("🔬 Daily: " + data[1])
     print("✔️ Daily Negative: " + data[2])
     print("🤒 Daily Positive: " + data[3])
     print("🤔 Daily Inconclusive: " + data[4])
-    print("\n")
     print("🔬 Total: " + data[5])
     print("✔️ Total Negative: " + data[6])
     print("🤒 Total Positive: " + data[7])
     print("🤔 Total Inconclusive: " + data[8])
-    print("\n")
     print("🥺 Isolation Count: " + data[9])
-
+    print("----------------------------")
 
 '''
 Data extraction part complete, discord part below.
 Example code skeleton structure from: https://github.com/Rapptz/discord.py/blob/master/examples/basic_bot.py
-'''
 
-'''
 Discord related imports.
 '''
 import discord, asyncio, datetime
@@ -130,13 +126,13 @@ TOKEN = 'bot token redacted'
 USER_ID_LENGTH = 18
 DAILY_CASE_LOCATION = 3
 TOTAL_CASE_LOCATION = 7
+SCHOOL_BANNER_LINK = "https://git.io/JUfcf"
 description = '''A bot to streamline the COVID-19 stats from the BU testing dashboard'''
 bot = commands.Bot(command_prefix='?', description=description)
 registeredUsers = []
 
 '''
 Gather initial testing data.
-
 First check is a bit complex in programming,
 the driver gets created and then deleted to optimize somewhat,
 data will then be updated from other functions.
@@ -165,7 +161,6 @@ def updateValues():
 
 '''
 Display bot information in the backend.
-
 After bot boots up, loads in the users that want updates.
 '''
 @bot.event
@@ -173,7 +168,14 @@ async def on_ready():
     print('Logged in as')
     print(bot.user.name)
     print(bot.user.id)
+    print(discord.__version__)
     print('------')
+
+    # Check how many servers this bot is serving.
+    serverCount = 0
+    for _ in bot.guilds:
+        serverCount += 1
+    print('Current server count: ' + str(serverCount))
 
     # Attempt to load in users that have already subscribed.
     try:
@@ -207,8 +209,8 @@ async def updateDashboard():
             # Account for cases where an user account is deleted/banned
             if (user != None):
                 try:
-                    await user.send("Infections case count increased by " + data[DAILY_CASE_LOCATION] + " on " + latestDataDate\
-                        + " to a total of " + data[TOTAL_CASE_LOCATION] + " cases.")
+                    await user.send("Infections increased by %s on %s to a total of %s cases." %\
+                        (data[DAILY_CASE_LOCATION], latestDataDate, data[TOTAL_CASE_LOCATION]))
                 except:
                     print(str(user) + " does not allow private messages.")
     else:
@@ -221,7 +223,6 @@ ready before starting the tasks.
 @updateDashboard.before_loop
 async def beforeReady():
     await bot.wait_until_ready()
-    print("Bot ready")
 
 '''
 Bot command stats will return the testing information.
@@ -231,26 +232,24 @@ async def stats(ctx):
     """Returns status of BU's testing data."""
 
     # Construct the embed containing appropriate values.
-    embed=discord.Embed(title="BU COVID-19 Testing Status", url="https://www.bu.edu/healthway/community-dashboard/", description="📅 Latest avaliable date: " + data[0], color=0xcc0000)
-    embed.set_thumbnail(url="https://prod.wp.cdn.aws.wfu.edu/sites/224/2020/01/boston-university-logo-bu-vector-eps-free-download-logo-icons-brand-emblems-148777131548ngk.png")
-    embed.add_field(name="🔬 Daily Tested:", value=data[1], inline=False)
+    embed=discord.Embed(title="BU COVID-19 Testing Status", url="https://www.bu.edu/healthway/community-dashboard/", description="📅 Latest avaliable data: " + data[0], color=0xcc0000)
+    embed.set_thumbnail(url=SCHOOL_BANNER_LINK)
+    embed.add_field(name=":microscope: Daily Tested:", value=data[1], inline=False)
     embed.add_field(name=":white_check_mark: Daily Negative:", value=data[2], inline=True)
     embed.add_field(name=":x: Daily Positive:", value=data[3], inline=True)
-    embed.add_field(name="🤔 Daily Inconclusive:", value=data[4], inline=True)
-    embed.add_field(name="🔬 Total Tested:", value=data[5], inline=False)
+    embed.add_field(name=":thinking: Daily Inconclusive:", value=data[4], inline=True)
+    embed.add_field(name=":microscope: Total Tested:", value=data[5], inline=False)
     embed.add_field(name=":white_check_mark: Total Negative:", value=data[6], inline=True)
     embed.add_field(name=":x: Total Positive:", value=data[7], inline=True)
-    embed.add_field(name="🤔 Total Inconclusive:", value=data[8], inline=True)
-    embed.add_field(name="🥺 Isolation Count:", value=data[9], inline=False)
+    embed.add_field(name=":thinking: Total Inconclusive:", value=data[8], inline=True)
+    embed.add_field(name=":zipper_mouth: Currently in isolation:", value=data[9], inline=False)
     embed.set_footer(text="Last updated: " + lastChecked.strftime("%Y-%m-%d %H:%M:%S"))
     return await ctx.send(embed=embed)
 
 '''
 Registers a user to recieve updates on new case if one is detected.
-
 Unregisteres a user if the register command is called when someone
 is arleady registered.
-
 Subscribers are stored as user id's, upon the bot restart it will
 attempt to relocate the users via looking them up by id.
 '''
@@ -266,7 +265,8 @@ async def register(ctx):
             for userEntry in registeredUsers:
                 userlist.write('%s\n' % userEntry.id)
         userlist.close()
-        return await ctx.send("<@"+str(user.id)+">"+", you are registered to recieve updates")
+        return await ctx.send("<@%s>, you are registered to recieve updates"\
+            % (str(user.id)))
     # This user wants to be removed from the subscriber list.
     else:
         registeredUsers.remove(user)
@@ -274,7 +274,8 @@ async def register(ctx):
             for userEntry in registeredUsers:
                 userlist.write('%s\n' % userEntry.id)
         userlist.close()
-        return await ctx.send("<@"+str(user.id)+">"+", you have been removed from recieving updates")
+        return await ctx.send("<@%s>, you have been removed from receiving updates"\
+            % (str(user.id)))
 
 '''
 Start background task and start bot.
