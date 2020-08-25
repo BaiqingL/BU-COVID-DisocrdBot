@@ -237,6 +237,7 @@ ready before starting the tasks.
 @updateDashboard.before_loop
 async def beforeReady():
     await bot.wait_until_ready()
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="BU COVID-19 Statistics"))
 
 '''
 Bot command stats will return the testing information.
