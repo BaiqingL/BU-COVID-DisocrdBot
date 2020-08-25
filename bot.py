@@ -79,6 +79,16 @@ def processData(rawDataSegment):
     isolationCountBeginIndex = rawDataSegment.rfind('\n',0,isolationCountEndIndex-1)
     isolationCount = rawDataSegment[isolationCountBeginIndex+1:isolationCountEndIndex-1]
 
+    # Find how many students have recovered
+    recoveredCountEndIndex = rawDataSegment.find("Recovered")
+    recoveredCountBeginIndex = rawDataSegment.rfind('\n',0,recoveredCountEndIndex-1)
+    recoveredCount = rawDataSegment[recoveredCountBeginIndex+1:recoveredCountEndIndex-1]
+
+    # Find confirmed noncontagious count
+    confirmedNoncontagiousCountEndIndex = rawDataSegment.find("Confirmed Noncontagious")
+    confirmedNoncontagiousCountBeginIndex = rawDataSegment.rfind('\n',0,confirmedNoncontagiousCountEndIndex-1)
+    confirmedNoncontagiousCount = rawDataSegment[confirmedNoncontagiousCountBeginIndex+1:confirmedNoncontagiousCountEndIndex-1]
+
     # Data array constructed with below values.
     return [
         date,
@@ -90,7 +100,9 @@ def processData(rawDataSegment):
         totalNegativeOutcome,
         totalPositiveOutcome,
         totalInconclusiveOutcome,
-        isolationCount
+        isolationCount,
+        recoveredCount,
+        confirmedNoncontagiousCount
         ]
     
 '''
@@ -108,6 +120,8 @@ def backendReport(data):
     print("🤒 Total Positive: " + data[7])
     print("🤔 Total Inconclusive: " + data[8])
     print("🥺 Isolation Count: " + data[9])
+    print("😷 Recovered Count: " + data[10])
+    print("🥳 Noncontagious Count: " + data[11])
     print("----------------------------")
 
 '''
@@ -242,7 +256,9 @@ async def stats(ctx):
     embed.add_field(name=":white_check_mark: Total Negative:", value=data[6], inline=True)
     embed.add_field(name=":x: Total Positive:", value=data[7], inline=True)
     embed.add_field(name=":thinking: Total Inconclusive:", value=data[8], inline=True)
-    embed.add_field(name=":zipper_mouth: Currently in isolation:", value=data[9], inline=False)
+    embed.add_field(name=":zipper_mouth: Isolation:", value=data[9], inline=True)
+    embed.add_field(name=":innocent: Recovered:", value=data[10], inline=True)
+    embed.add_field(name=":partying_face: Noncontagious:", value=data[11], inline=True)
     embed.set_footer(text="Last updated: " + lastChecked.strftime("%Y-%m-%d %H:%M:%S"))
     return await ctx.send(embed=embed)
 
