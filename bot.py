@@ -104,7 +104,7 @@ def processData(rawDataSegment):
         recoveredCount,
         confirmedNoncontagiousCount
         ]
-    
+
 '''
 Make the data look nicer in the backend.
 '''
@@ -136,7 +136,8 @@ from discord.ext import commands, tasks
 '''
 Constants and bot initilization.
 '''
-TOKEN = 'bot token redacted'
+with open('bot.token', 'r') as tokenFile:
+    TOKEN = tokenFile.read().strip()
 USER_ID_LENGTH = 18
 DAILY_CASE_LOCATION = 3
 TOTAL_CASE_LOCATION = 7

@@ -1,3 +1,9 @@
+# Bot token file
+bot.token
+
+# Subscribers of the bot
+users
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
