@@ -32,3 +32,5 @@ Add it here: https://discord.com/api/oauth2/authorize?client_id=7462010708328448
 If you decide to *add the bot to your server*, the only information stored will be the **total amount of servers** that the bot is in. Meaning, you will contribute a single number to a total server count value. I do this to get an idea of *how many servers are using it*, and if I need to optimize some code to make it run better.
 
 If you decide to *sign up for live updates*, your unique **Discord account ID number** will be stored. This information can be *accessed by anybody in the same servers as you*. The reason why I am storing this information is to *remind the bot who to message* in case I need to restart the bot for maintenance or updates.
+
+**Information will never be shared, and is stored in a private server accessable only through key based SSH**
