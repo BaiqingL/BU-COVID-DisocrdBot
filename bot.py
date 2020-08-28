@@ -5,6 +5,7 @@ from selenium.webdriver.chrome.options import Options
 
 # Constants.
 ESTIMATED_DATA_LENGTH = 1300
+DASHBOARD_LINK = "https://app.powerbi.com/view?r=eyJrIjoiMzI4OTBlMzgtODg5MC00OGEwLThlMDItNGJiNDdjMDU5ODhkIiwidCI6ImQ1N2QzMmNjLWMxMjEtNDg4Zi1iMDdiLWRmZTcwNTY4MGM3MSIsImMiOjN9"
 
 '''
 Initiate a driver instance of the chrome web browser to render the javascript.
@@ -21,7 +22,7 @@ Since BU uses Microsoft Power BI to display data, it is a javascript driven page
 This means we need to use selenium to properly render and grab data.
 '''
 def getRawData(driver):
-    driver.get('https://app.powerbi.com/view?r=eyJrIjoiMzI4OTBlMzgtODg5MC00OGEwLThlMDItNGJiNDdjMDU5ODhkIiwidCI6ImQ1N2QzMmNjLWMxMjEtNDg4Zi1iMDdiLWRmZTcwNTY4MGM3MSIsImMiOjN9')
+    driver.get(DASHBOARD_LINK)
     # We are looking for reportLandingContainer, wait for the page to populate with proper results before exiting.
     rawDataSegment = ""
     while len(rawDataSegment) < ESTIMATED_DATA_LENGTH:
@@ -54,7 +55,8 @@ def processData(rawDataSegment):
     dailyPositiveOutcome = rawDataSegment[dailyPositiveBeginIndex+1:dailyPositiveEndIndex-1]
 
     # Find how many test were inconclusive.
-    dailyInconclusiveOutcome = str(int(dailyTestConducted.replace(',','')) - int(dailyNegativeOutcome.replace(',','')) - int(dailyPositiveOutcome.replace(',','')))
+    dailyInconclusiveOutcome = str(int(dailyTestConducted.replace(',','')) - \
+        int(dailyNegativeOutcome.replace(',','')) - int(dailyPositiveOutcome.replace(',','')))
 
     # Find how many tests were done in total.
     totalTestEndIndex = rawDataSegment.find("Test Results", dailyTestEndIndex+1)
@@ -72,7 +74,8 @@ def processData(rawDataSegment):
     totalPositiveOutcome = rawDataSegment[totalPositiveBeginIndex+1:totalPositiveEndIndex-1]
 
     # Find how many test were inconclusive.
-    totalInconclusiveOutcome = str(int(totalTestConducted.replace(',','')) - int(totalNegativeOutcome.replace(',','')) - int(totalPositiveOutcome.replace(',','')))
+    totalInconclusiveOutcome = str(int(totalTestConducted.replace(',','')) - \
+        int(totalNegativeOutcome.replace(',','')) - int(totalPositiveOutcome.replace(',','')))
 
     # Find how many students are in isolation.
     isolationCountEndIndex = rawDataSegment.find("Currently in Isolation")
@@ -138,6 +141,8 @@ Constants and bot initilization.
 '''
 with open('bot.token', 'r') as tokenFile:
     TOKEN = tokenFile.read().strip()
+tokenFile.close()
+
 USER_ID_LENGTH = 18
 DAILY_CASE_LOCATION = 3
 TOTAL_CASE_LOCATION = 7
@@ -248,7 +253,8 @@ async def stats(ctx):
     """Returns status of BU's testing data."""
 
     # Construct the embed containing appropriate values.
-    embed=discord.Embed(title="BU COVID-19 Testing Status", url="https://www.bu.edu/healthway/community-dashboard/", description="📅 Latest avaliable data: " + data[0], color=0xcc0000)
+    embed=discord.Embed(title="BU COVID-19 Testing Status", url="https://www.bu.edu/healthway/community-dashboard/", \
+        description="📅 Latest avaliable data: " + data[0], color=0xcc0000)
     embed.set_thumbnail(url=SCHOOL_BANNER_LINK)
     embed.add_field(name=":microscope: Daily Tested:", value=data[1], inline=False)
     embed.add_field(name=":white_check_mark: Daily Negative:", value=data[2], inline=True)
