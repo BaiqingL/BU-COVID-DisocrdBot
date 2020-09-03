@@ -18,6 +18,8 @@ Stats reported include:
 7. Total positive tests
 8. Total failed tests
 9. How many students are in quaratine
+10. How many students have recovered
+11. How many cases are deemed to be non-contagious
 
 * **`?register`**
 
