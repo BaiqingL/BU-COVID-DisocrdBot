@@ -1,5 +1,5 @@
 # Import web driver code.
-import time
+import time, re
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
@@ -35,25 +35,22 @@ String manipulation to parse data.
 '''
 def processData(rawDataSegment):
     # Find date of the latest data.
-    dateEndIndex = rawDataSegment.find("Negative")
+    dateEndIndex = rawDataSegment.find("Negative Tests")
     dateBeginIndex = rawDataSegment.rfind('\n',0,dateEndIndex-1)
     date = rawDataSegment[dateBeginIndex+1:dateEndIndex-1]
 
     # Find how many tests were done in a day.
-    dailyTestEndIndex = rawDataSegment.find("Test Results")
+    dailyTestEndIndex = rawDataSegment.find("Test Results*")
     dailyTestBeginIndex = rawDataSegment.rfind('\n',0,dailyTestEndIndex-1)
-    dailyTestConducted = rawDataSegment[dailyTestBeginIndex+1:dailyTestEndIndex-1]
-
+    dailyTestConducted = re.sub("[^0-9]", "", rawDataSegment[dailyTestBeginIndex+1:dailyTestEndIndex-1])
     # Find how many tests were negative in day.
-    dailyNegativeEndIndex = rawDataSegment.find("Negative Tests")
+    dailyNegativeEndIndex = rawDataSegment.find("Negative Tests", dailyTestEndIndex)
     dailyNegativeBeginIndex = rawDataSegment.rfind('\n',0,dailyNegativeEndIndex-1)
-    dailyNegativeOutcome = rawDataSegment[dailyNegativeBeginIndex+1:dailyNegativeEndIndex-1]
-
+    dailyNegativeOutcome = re.sub("[^0-9]", "", rawDataSegment[dailyNegativeBeginIndex+1:dailyNegativeEndIndex-1])
     # Find how many tests were positive in a day.
-    dailyPositiveEndIndex = rawDataSegment.find("Positive Tests")
+    dailyPositiveEndIndex = rawDataSegment.find("Positive Tests", dailyNegativeEndIndex)
     dailyPositiveBeginIndex = rawDataSegment.rfind('\n',0,dailyPositiveEndIndex-1)
-    dailyPositiveOutcome = rawDataSegment[dailyPositiveBeginIndex+1:dailyPositiveEndIndex-1]
-
+    dailyPositiveOutcome = re.sub("[^0-9]", "", rawDataSegment[dailyPositiveBeginIndex+1:dailyPositiveEndIndex-1])
     # Find how many test were inconclusive.
     dailyInconclusiveOutcome = str(int(dailyTestConducted.replace(',','')) - \
         int(dailyNegativeOutcome.replace(',','')) - int(dailyPositiveOutcome.replace(',','')))
@@ -117,14 +114,11 @@ def backendReport(data):
     print("🔬 Daily: " + data[1])
     print("✔️ Daily Negative: " + data[2])
     print("🤒 Daily Positive: " + data[3])
-    print("🤔 Daily Inconclusive: " + data[4])
     print("🔬 Total: " + data[5])
     print("✔️ Total Negative: " + data[6])
     print("🤒 Total Positive: " + data[7])
-    print("🤔 Total Inconclusive: " + data[8])
     print("🥺 Isolation Count: " + data[9])
     print("😷 Recovered Count: " + data[10])
-    print("🥳 Noncontagious Count: " + data[11])
     print("----------------------------")
 
 '''
@@ -221,7 +215,7 @@ async def updateDashboard():
     # Report data array to the backend, consult processData() for value meaning.
     print("Update finished on: " + lastChecked.strftime("%Y-%m-%d %H:%M:%S"))
     backendReport(data)
-    
+ 
     # Check to see if the bot needs to send out alerts
     if data[DAILY_CASE_LOCATION] != 0 and data[0] != tempDate:
         print("New case detected, alerting users.")
@@ -259,14 +253,11 @@ async def stats(ctx):
     embed.add_field(name=":microscope: Daily Tested:", value=data[1], inline=False)
     embed.add_field(name=":white_check_mark: Daily Negative:", value=data[2], inline=True)
     embed.add_field(name=":x: Daily Positive:", value=data[3], inline=True)
-    embed.add_field(name=":thinking: Daily Inconclusive:", value=data[4], inline=True)
     embed.add_field(name=":microscope: Total Tested:", value=data[5], inline=False)
     embed.add_field(name=":white_check_mark: Total Negative:", value=data[6], inline=True)
     embed.add_field(name=":x: Total Positive:", value=data[7], inline=True)
-    embed.add_field(name=":thinking: Total Inconclusive:", value=data[8], inline=True)
-    embed.add_field(name=":zipper_mouth: Isolation:", value=data[9], inline=True)
-    embed.add_field(name=":innocent: Recovered:", value=data[10], inline=True)
-    embed.add_field(name=":partying_face: Noncontagious:", value=data[11], inline=True)
+    embed.add_field(name=":zipper_mouth: Isolation:", value=data[9], inline=False)
+    embed.add_field(name=":innocent: Recovered:", value=data[10], inline=False)
     embed.set_footer(text="Last updated: " + lastChecked.strftime("%Y-%m-%d %H:%M:%S"))
     return await ctx.send(embed=embed)
 
