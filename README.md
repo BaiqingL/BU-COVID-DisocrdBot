@@ -12,14 +12,11 @@ Stats reported include:
 1. Daily tests conducted
 2. Daily negative tests
 3. Daily positive tests
-4. Daily failed tests
-5. Total tests conducted
-6. Total negative tests
-7. Total positive tests
-8. Total failed tests
-9. How many students are in quaratine
-10. How many students have recovered
-11. How many cases are deemed to be non-contagious
+4. Total tests conducted
+5. Total negative tests
+6. Total positive tests
+7. How many students are in quaratine
+8. How many students have recovered
 
 * **`?register`**
 
