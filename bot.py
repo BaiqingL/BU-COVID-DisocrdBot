@@ -35,7 +35,7 @@ String manipulation to parse data.
 '''
 def processData(rawDataSegment):
     # Find date of the latest data.
-    dateEndIndex = rawDataSegment.find("Negative Tests")
+    dateEndIndex = rawDataSegment.rfind("Negative Tests")
     dateBeginIndex = rawDataSegment.rfind('\n',0,dateEndIndex-1)
     date = rawDataSegment[dateBeginIndex+1:dateEndIndex-1]
 
