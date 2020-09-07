@@ -35,7 +35,7 @@ String manipulation to parse data.
 '''
 def processData(rawDataSegment):
     # Find date of the latest data.
-    dateEndIndex = rawDataSegment.rfind("Negative Tests")
+    dateEndIndex = rawDataSegment.find("Negative Tests\nPositive Tests\nBU Testing This Week:")
     dateBeginIndex = rawDataSegment.rfind('\n',0,dateEndIndex-1)
     date = rawDataSegment[dateBeginIndex+1:dateEndIndex-1]
 
@@ -51,12 +51,9 @@ def processData(rawDataSegment):
     dailyPositiveEndIndex = rawDataSegment.find("Positive Tests", dailyNegativeEndIndex)
     dailyPositiveBeginIndex = rawDataSegment.rfind('\n',0,dailyPositiveEndIndex-1)
     dailyPositiveOutcome = re.sub("[^0-9]", "", rawDataSegment[dailyPositiveBeginIndex+1:dailyPositiveEndIndex-1])
-    # Find how many test were inconclusive.
-    dailyInconclusiveOutcome = str(int(dailyTestConducted.replace(',','')) - \
-        int(dailyNegativeOutcome.replace(',','')) - int(dailyPositiveOutcome.replace(',','')))
 
     # Find how many tests were done in total.
-    totalTestEndIndex = rawDataSegment.find("Test Results", dailyTestEndIndex+1)
+    totalTestEndIndex = rawDataSegment.find("Test Results*", dailyTestEndIndex+1)
     totalTestBeginIndex = rawDataSegment.rfind('\n',0,totalTestEndIndex-1)
     totalTestConducted = rawDataSegment[totalTestBeginIndex+1:totalTestEndIndex-1]
 
@@ -70,24 +67,15 @@ def processData(rawDataSegment):
     totalPositiveBeginIndex = rawDataSegment.rfind('\n',0,totalPositiveEndIndex-1)
     totalPositiveOutcome = rawDataSegment[totalPositiveBeginIndex+1:totalPositiveEndIndex-1]
 
-    # Find how many test were inconclusive.
-    totalInconclusiveOutcome = str(int(totalTestConducted.replace(',','')) - \
-        int(totalNegativeOutcome.replace(',','')) - int(totalPositiveOutcome.replace(',','')))
-
     # Find how many students are in isolation.
     isolationCountEndIndex = rawDataSegment.find("Currently in Isolation")
     isolationCountBeginIndex = rawDataSegment.rfind('\n',0,isolationCountEndIndex-1)
     isolationCount = rawDataSegment[isolationCountBeginIndex+1:isolationCountEndIndex-1]
 
     # Find how many students have recovered
-    recoveredCountEndIndex = rawDataSegment.find("Recovered")
+    recoveredCountEndIndex = rawDataSegment.rfind("Recovered")
     recoveredCountBeginIndex = rawDataSegment.rfind('\n',0,recoveredCountEndIndex-1)
     recoveredCount = rawDataSegment[recoveredCountBeginIndex+1:recoveredCountEndIndex-1]
-
-    # Find confirmed noncontagious count
-    confirmedNoncontagiousCountEndIndex = rawDataSegment.find("Confirmed Noncontagious")
-    confirmedNoncontagiousCountBeginIndex = rawDataSegment.rfind('\n',0,confirmedNoncontagiousCountEndIndex-1)
-    confirmedNoncontagiousCount = rawDataSegment[confirmedNoncontagiousCountBeginIndex+1:confirmedNoncontagiousCountEndIndex-1]
 
     # Data array constructed with below values.
     return [
@@ -95,14 +83,11 @@ def processData(rawDataSegment):
         dailyTestConducted,
         dailyNegativeOutcome,
         dailyPositiveOutcome,
-        dailyInconclusiveOutcome,
         totalTestConducted,
         totalNegativeOutcome,
         totalPositiveOutcome,
-        totalInconclusiveOutcome,
         isolationCount,
-        recoveredCount,
-        confirmedNoncontagiousCount
+        recoveredCount
         ]
 
 '''
@@ -114,9 +99,9 @@ def backendReport(data):
     print("Daily: " + data[1])
     print("Daily Negative: " + data[2])
     print("Daily Positive: " + data[3])
-    print("Total: " + data[5])
-    print("Total Negative: " + data[6])
-    print("Total Positive: " + data[7])
-    print("Isolation Count: " + data[9])
-    print("Recovered Count: " + data[10])
+    print("Total: " + data[4])
+    print("Total Negative: " + data[5])
+    print("Total Positive: " + data[6])
+    print("Isolation Count: " + data[7])
+    print("Recovered Count: " + data[8])
     print("----------------------------")
