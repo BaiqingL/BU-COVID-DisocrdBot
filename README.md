@@ -1,5 +1,6 @@
 # BU COVID-19 Alerts via Discord
 Automatically scrape the BU COVID-19 statistics and update them to a discord channel for faster access.
+*Temporarily disabled until BU dashboard calms down with their layout changes*
 
 Consult the [privacy statement](#Privacy-Statement) to understand what data this bot collects about you.
 
